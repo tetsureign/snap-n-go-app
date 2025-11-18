@@ -4,7 +4,7 @@ A Google Lens-like mobile app that detects objects in images and searches for sh
 
 This is a university project. Originally a two-person project. You can view it at the branch [uni-project-finalver](https://github.com/tetsureign/SnapAndGo/tree/uni-project-finalver). I mostly did the React Native app and detection integration. History was saved to a Firebase instance, done by [@SwankyOrcc](https://github.com/SwankyOrcc). I've decided to iterate through this project from time to time and build a separate backend to study.
 
-## Project History
+## Project History and Decisions
 
 ### Initial Development (University Project - late 2022)
 
