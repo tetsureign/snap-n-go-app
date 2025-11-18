@@ -108,7 +108,7 @@ const ImageDetectPage = ({route, navigation}: ImageDetectPageProps) => {
         onChange={(position, height) => {
           setSheetChildrenHeight(height);
         }}>
-        <View style={[styles.actionSheetItems]}>
+        <View style={styles.actionSheetItems}>
           {/* The main buttons */}
           {detectionState.fetchResult?.length ? (
             <SelectedResultContext.Provider
