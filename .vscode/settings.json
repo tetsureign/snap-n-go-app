@@ -1,20 +1,3 @@
 {
-  "typescript.tsdk": "node_modules\\typescript\\lib",
-  "colorTabs.config": [
-    {
-      "regex": "\\.*",
-      "color": "#ffca28"
-    },
-    {
-      "regex": ".*/web/.*"
-    },
-    {
-      "regex": ".*/mobile/.*"
-    }
-  ],
-  "workbench.colorCustomizations": {
-    "tab.activeBorder": "#ffca28",
-    "statusBar.foreground": "#ffffff"
-  },
-  "colorTabs.statusBarBackground": false
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }
