@@ -20,6 +20,7 @@ export default ({config}) => {
         config: {
           googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
         },
+        bundleIdentifier: 'com.snapandgo',
       },
       extra: {
         eas: {
