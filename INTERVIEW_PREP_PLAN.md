@@ -68,7 +68,9 @@ const DetectResult = ({fetchResult, type}: DetectResultProps) => {
 
     return (
       <DetectResultRenderer
-        key={index}
+        // INTERVIEW TIP: Avoid using the array index as the key. 
+        // Use a unique stable identifier (e.g. element.id or a composite string) to prevent rendering bugs.
+        key={`${element.object}-${index}`}
         element={element}
         index={index}
         isReliable={isReliable}
@@ -82,6 +84,10 @@ const DetectResult = ({fetchResult, type}: DetectResultProps) => {
 };
 ```
 
+> [!WARNING]
+> **Interview Red Flag: Using Index as Key**
+> Even if the array elements don't change positions, passing `key={index}` is a red flag to senior interviewers. Be prepared to explain how React uses keys for the reconciliation algorithm to identify which items have changed, been added, or been removed.
+
 #### Solution B: The Context Splitting Pattern (Advanced Context Optimization)
 If prop-drilling gets too deep, interviewers will look for **Context Splitting**.
 Instead of one context, split it into two:
@@ -89,6 +95,20 @@ Instead of one context, split it into two:
 2. `SelectedResultDispatchContext`: Holds only `setSelectedResult`.
 
 Since the dispatch function reference (`setSelectedResult`) never changes, components that only trigger actions (like buttons or touch handlers) will never re-render when the selected state changes.
+
+### Interview Callout: When is Context Actually Worth It?
+
+For the current features of `SnapAndGo`, using Context is an **anti-pattern** because the prop-drilling distance is only one level deep (from the page component to the mapped items). Using Context adds boilerplate and breaks `React.memo` unless split.
+
+In interviews, explain that you choose Context only for **global, cross-cutting concerns** that satisfy three criteria:
+1. **High distance:** Deeply nested components or separate sub-trees need the data (e.g., Auth state in both Router and Settings).
+2. **Unavoidable drilling:** Intermediate components (like React Navigation structure) block direct prop-drilling.
+3. **Low update frequency:** Data that changes rarely. (High-frequency state like drag coordinates or selection updates cause performance bottlenecks in Context).
+
+#### Valid Context Use Cases for `SnapAndGo`:
+* **Global Authentication State:** Storing `userToken`, user profiles, and `logout` actions to conditionally load stacks and authorize API interceptors.
+* **Device Permissions Context:** Tracking `expo-camera` and location authorization centrally across multiple pages.
+* **Global Toast System:** Triggering overlay error messages (e.g., YOLOv5 network failures) from nested hook calls.
 
 ---
 
