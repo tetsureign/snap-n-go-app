@@ -52,7 +52,7 @@ const DetectResult = ({
       <DetectResultRenderer
         element={element}
         index={index}
-        key={index}
+        key={`${element.object}-${index}`}
         isReliable={isReliable}
         renderType={type}
         isSelected={isSelected}

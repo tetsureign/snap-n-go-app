@@ -117,7 +117,7 @@ const TabsNavigator = () => {
             name={element.name}
             component={element.component}
             options={element.options}
-            key={index}
+            key={`${element.name}-${index}`}
           />
         );
       })}
