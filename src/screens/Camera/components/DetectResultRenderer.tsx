@@ -1,12 +1,7 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {View, TouchableOpacity, Text} from 'react-native';
-
 import {GeneralButton} from '@/components/Buttons';
-
-import {SelectedResultContext} from '@/contexts/DetectionResultContext';
-
 import {DetectionResultType} from '@/types/detection';
-
 import {styles} from './DetectResultRenderer.styles';
 
 type Props = {
@@ -14,6 +9,9 @@ type Props = {
   index: number;
   isReliable: boolean;
   renderType: 'button' | 'rect';
+  isSelected: boolean;
+  onSelect: (index: number) => void;
+  resizeRatio: number;
 };
 
 const DetectResultRendererComponent = ({
@@ -21,16 +19,15 @@ const DetectResultRendererComponent = ({
   index,
   isReliable,
   renderType,
+  isSelected,
+  onSelect,
+  resizeRatio,
 }: Props) => {
-  const {selectedResult, setSelectedResult, resizeRatio} = useContext(
-    SelectedResultContext,
-  );
-
-  const buttonStyle = selectedResult.index !== index && styles.itemBackground;
+  const buttonStyle = !isSelected && styles.itemBackground;
   const textStyle = [
     styles.itemsText,
     isReliable ? styles.itemsTextWhite : styles.itemsTextFade,
-    selectedResult.index === index && styles.itemsTextWhite,
+    isSelected && styles.itemsTextWhite,
   ];
 
   const rectStyle = {
@@ -40,18 +37,10 @@ const DetectResultRendererComponent = ({
     top: element.coordinate.y0 * resizeRatio,
   };
 
-  function handlePress() {
-    setSelectedResult(
-      selectedResult.index === index
-        ? {result: null, index: null}
-        : {result: element.object, index},
-    );
-  }
-
   return (
     <>
       {renderType === 'button' ? (
-        <GeneralButton style={buttonStyle} onPress={handlePress}>
+        <GeneralButton style={buttonStyle} onPress={() => onSelect(index)}>
           <View style={styles.itemsTextContainer}>
             <Text style={textStyle}>{element.object}</Text>
             <Text style={textStyle}>{Math.round(element.score)}%</Text>
@@ -59,11 +48,11 @@ const DetectResultRendererComponent = ({
         </GeneralButton>
       ) : (
         <TouchableOpacity
-          onPress={handlePress}
+          onPress={() => onSelect(index)}
           style={[
             styles.rect,
             isReliable && styles.rectFade,
-            selectedResult.index === index && styles.rectWhite,
+            isSelected && styles.rectWhite,
             rectStyle,
           ]}
         />

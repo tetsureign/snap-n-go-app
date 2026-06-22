@@ -1,5 +1,5 @@
 import {ArrowLeft, Refresh, Search} from 'iconoir-react-native';
-import React from 'react';
+import React, {useCallback} from 'react';
 import {ImageBackground, View} from 'react-native';
 
 import {DarkPersistentActionSheet} from '@/components/ActionSheet/';
@@ -7,7 +7,6 @@ import {GoButton} from '@/components/Buttons';
 import {ErrorChip} from '@/components/ErrorMessage';
 import FocusAwareStatusBar from '@/components/FocusAwareStatusBar';
 import {LoadingIndicator} from '@/components/LoadingIndicator';
-import {SelectedResultContext} from '@/contexts/DetectionResultContext';
 import {DarkTheme} from '@/styles/theme';
 import {DetectionResultType} from '@/types/detection';
 import {ImageDetectPageProps} from '@/types/navigation';
@@ -19,13 +18,36 @@ import {styles} from '@/screens/Camera/ImageDetectPage.styles';
 type DetectResultProps = {
   fetchResult: DetectionResultType[];
   type: 'button' | 'rect';
+  selectedResult: {result: string; index: number};
+  setSelectedResult: (
+    value: React.SetStateAction<{result: string; index: number}>,
+  ) => void;
+  resizeRatio: number;
 };
 
 const RELIABILITY_THRESHOLD = 70;
+const DetectResult = ({
+  fetchResult,
+  type,
+  selectedResult,
+  setSelectedResult,
+  resizeRatio,
+}: DetectResultProps) => {
+  const handleSelect = useCallback(
+    (index: number) => {
+      setSelectedResult(prev =>
+        prev.index === index
+          ? {result: '', index: -1}
+          : {result: fetchResult[index].object, index},
+      );
+    },
+    [fetchResult, setSelectedResult],
+  );
 
-const DetectResult = ({fetchResult, type}: DetectResultProps) => {
   return fetchResult.map((element, index) => {
     const isReliable = element.score >= RELIABILITY_THRESHOLD;
+    const isSelected = selectedResult.index === index;
+
     return (
       <DetectResultRenderer
         element={element}
@@ -33,6 +55,9 @@ const DetectResult = ({fetchResult, type}: DetectResultProps) => {
         key={index}
         isReliable={isReliable}
         renderType={type}
+        isSelected={isSelected}
+        onSelect={handleSelect}
+        resizeRatio={resizeRatio || 1}
       />
     );
   });
@@ -77,17 +102,13 @@ const ImageDetectPage = ({route, navigation}: ImageDetectPageProps) => {
                 width: imageWidthDevice,
                 height: photo.height * resizeRatio,
               }}>
-              <SelectedResultContext.Provider
-                value={{
-                  selectedResult,
-                  setSelectedResult,
-                  resizeRatio,
-                }}>
-                <DetectResult
-                  fetchResult={detectionState.fetchResult}
-                  type="rect"
-                />
-              </SelectedResultContext.Provider>
+              <DetectResult
+                fetchResult={detectionState.fetchResult}
+                type="rect"
+                selectedResult={selectedResult}
+                setSelectedResult={setSelectedResult}
+                resizeRatio={resizeRatio}
+              />
             </View>
           </View>
         )}
@@ -111,16 +132,13 @@ const ImageDetectPage = ({route, navigation}: ImageDetectPageProps) => {
         <View style={[styles.actionSheetItems]}>
           {/* The main buttons */}
           {detectionState.fetchResult?.length ? (
-            <SelectedResultContext.Provider
-              value={{
-                selectedResult,
-                setSelectedResult,
-              }}>
-              <DetectResult
-                fetchResult={detectionState.fetchResult}
-                type="button"
-              />
-            </SelectedResultContext.Provider>
+            <DetectResult
+              fetchResult={detectionState.fetchResult}
+              type="button"
+              selectedResult={selectedResult}
+              setSelectedResult={setSelectedResult}
+              resizeRatio={resizeRatio}
+            />
           ) : detectionState.status === 'empty' ? (
             <GoButton
               onPress={goBack}
